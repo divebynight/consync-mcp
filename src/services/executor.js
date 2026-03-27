@@ -3,6 +3,29 @@ const http = require("http");
 const { logDebug, logError } = require("../utils/debug");
 const toolSchema = require("../schemas/tool-schema");
 
+const DEFAULT_SERVER_PORT = 3000;
+const DEFAULT_SERVER_HOST = "127.0.0.1";
+
+function resolveServerPort() {
+  const port = Number.parseInt(process.env.CONSYNC_SERVER_PORT || "", 10);
+
+  if (Number.isInteger(port) && port > 0 && port <= 65535) {
+    return port;
+  }
+
+  return DEFAULT_SERVER_PORT;
+}
+
+function resolveAuthToken() {
+  const token = process.env.CONSYNC_AUTH_TOKEN;
+
+  if (typeof token === "string" && token.trim()) {
+    return token.trim();
+  }
+
+  return "";
+}
+
 function isPlainObject(value) {
   return Object.prototype.toString.call(value) === "[object Object]";
 }
@@ -67,18 +90,24 @@ function callTool(payload, options) {
   return new Promise((resolve, reject) => {
     const data = JSON.stringify(payload);
     const runId = options && options.runId;
+    const authToken = resolveAuthToken();
+    const headers = {
+      "Content-Type": "application/json",
+      "Content-Length": Buffer.byteLength(data),
+      "X-Run-Id": runId || "local"
+    };
+
+    if (authToken) {
+      headers.Authorization = `Bearer ${authToken}`;
+    }
 
     const req = http.request(
       {
-        hostname: "localhost",
-        port: 3000,
+        hostname: DEFAULT_SERVER_HOST,
+        port: resolveServerPort(),
         path: "/tool",
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Content-Length": Buffer.byteLength(data),
-          "X-Run-Id": runId || "local"
-        }
+        headers
       },
       res => {
         let body = "";

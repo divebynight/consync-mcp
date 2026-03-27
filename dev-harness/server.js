@@ -9,6 +9,72 @@ const {
 } = require("../src/utils/whiteboard-path");
 
 const MAX_BODY_SIZE = 64 * 1024;
+const DEFAULT_SERVER_HOST = "127.0.0.1";
+const DEFAULT_SERVER_PORT = 3000;
+
+function resolveServerPort() {
+  const port = Number.parseInt(process.env.CONSYNC_SERVER_PORT || "", 10);
+
+  if (Number.isInteger(port) && port > 0 && port <= 65535) {
+    return port;
+  }
+
+  return DEFAULT_SERVER_PORT;
+}
+
+function resolveServerHost() {
+  const host = process.env.CONSYNC_SERVER_HOST;
+
+  if (typeof host === "string" && host.trim()) {
+    return host.trim();
+  }
+
+  return DEFAULT_SERVER_HOST;
+}
+
+function resolveAuthToken() {
+  const token = process.env.CONSYNC_AUTH_TOKEN;
+
+  if (typeof token === "string" && token.trim()) {
+    return token.trim();
+  }
+
+  return "";
+}
+
+function sanitizeRequestId(value) {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  return value.trim().replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 32);
+}
+
+function createRequestId() {
+  return Math.random().toString(36).slice(2, 10);
+}
+
+function resolveRequestId(req) {
+  return sanitizeRequestId(req.headers["x-run-id"]) || createRequestId();
+}
+
+function isAuthorizedRequest(req, authToken) {
+  if (!authToken) {
+    return true;
+  }
+
+  const headerValue = req.headers.authorization;
+
+  if (typeof headerValue !== "string" || !headerValue.startsWith("Bearer ")) {
+    return false;
+  }
+
+  return headerValue.slice(7) === authToken;
+}
+
+const SERVER_HOST = resolveServerHost();
+const SERVER_PORT = resolveServerPort();
+const AUTH_TOKEN = resolveAuthToken();
 
 function getWhiteboardPath() {
   return validateWhiteboardPath(resolveWhiteboardPath());
@@ -65,7 +131,14 @@ function sendJson(res, statusCode, payload, headers) {
 
 const server = http.createServer((req, res) => {
   if (req.url === "/tool") {
+    const runId = resolveRequestId(req);
+
     if (req.method !== "POST") {
+      logError("server", "Rejected request: method not allowed", {
+        runId,
+        method: req.method,
+        url: req.url
+      });
       return sendJson(res, 405, { error: "Method Not Allowed" }, {
         Allow: "POST"
       });
@@ -73,21 +146,36 @@ const server = http.createServer((req, res) => {
 
     const contentType = req.headers["content-type"] || "";
 
+    logDebug("server", "Incoming /tool request", {
+      runId,
+      method: req.method,
+      url: req.url,
+      contentType,
+      authEnabled: Boolean(AUTH_TOKEN)
+    });
+
+    if (!isAuthorizedRequest(req, AUTH_TOKEN)) {
+      logError("server", "Rejected request: unauthorized", {
+        runId,
+        method: req.method,
+        url: req.url
+      });
+      return sendJson(res, 401, { error: "Unauthorized" }, {
+        "WWW-Authenticate": "Bearer"
+      });
+    }
+
     if (!contentType.toLowerCase().includes("application/json")) {
+      logError("server", "Rejected request: unsupported media type", {
+        runId,
+        contentType
+      });
       return sendJson(res, 415, { error: "Unsupported Media Type" });
     }
 
     let body = "";
     let bodySize = 0;
     let bodyTooLarge = false;
-    const runId = req.headers["x-run-id"] || "local";
-
-    logDebug("server", "Incoming /tool request", {
-      runId,
-      method: req.method,
-      url: req.url,
-      contentType
-    });
 
     req.on("data", chunk => {
       if (bodyTooLarge) {
@@ -180,6 +268,8 @@ const server = http.createServer((req, res) => {
   sendJson(res, 404, { error: "Not Found" });
 });
 
-server.listen(3000, () => {
-  console.log("Dev Harness Tool Server running on http://localhost:3000");
+server.listen(SERVER_PORT, SERVER_HOST, () => {
+  console.log(
+    `Dev Harness Tool Server running on http://${SERVER_HOST}:${SERVER_PORT} (auth ${AUTH_TOKEN ? "enabled" : "disabled"})`
+  );
 });

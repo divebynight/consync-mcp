@@ -40,6 +40,44 @@ node dev-harness/client.js decide "show it"
 node dev-harness/client.js agent "add ## hello from agent"
 ```
 
+## Configuration
+
+The server supports a small set of environment variables for local development and temporary tunnel exposure:
+
+```text
+CONSYNC_SERVER_HOST     Bind host for the HTTP server (default: 127.0.0.1)
+CONSYNC_SERVER_PORT     Bind port for the HTTP server (default: 3000)
+CONSYNC_AUTH_TOKEN      Optional bearer token for /tool requests
+CONSYNC_WHITEBOARD_PATH Optional path override for the shared whiteboard file
+```
+
+### Local-only mode
+
+For normal local development, keep the default loopback binding and leave authentication disabled:
+
+```bash
+CONSYNC_SERVER_HOST=127.0.0.1
+CONSYNC_SERVER_PORT=3000
+```
+
+### Tunnel-exposed mode
+
+For temporary exposure through a tunnel such as ngrok, keep the server bound to loopback and set a bearer token:
+
+```bash
+CONSYNC_SERVER_HOST=127.0.0.1
+CONSYNC_SERVER_PORT=3000
+CONSYNC_AUTH_TOKEN=replace-with-a-long-random-token
+```
+
+When `CONSYNC_AUTH_TOKEN` is set, requests to `/tool` must include:
+
+```text
+Authorization: Bearer <token>
+```
+
+The server logs a request ID for every request. That request ID is used only in server-side logs for tracing and is not returned to clients.
+
 ## Project layout
 
 ```text
