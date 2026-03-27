@@ -1,9 +1,7 @@
 const fs = require("fs");
-const path = require("path");
 
 const { getRunId, logDebug } = require("./debug");
-
-const DEFAULT_WHITEBOARD_PATH = path.join(__dirname, "artifacts", "whiteboard.md");
+const { resolveWhiteboardPath } = require("../src/utils/whiteboard-path");
 
 function summarize(content, exists) {
   return {
@@ -17,7 +15,7 @@ function summarize(content, exists) {
 }
 
 function loadState(overridePath) {
-  const whiteboardPath = overridePath || DEFAULT_WHITEBOARD_PATH;
+  const whiteboardPath = resolveWhiteboardPath(overridePath);
   const runId = getRunId();
 
   if (!fs.existsSync(whiteboardPath)) {

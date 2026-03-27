@@ -5,3 +5,5 @@ dist
 coverage
 *.log
 artifacts/*
+/artifacts/whiteboard.md
+!/artifacts/whiteboard.example.md

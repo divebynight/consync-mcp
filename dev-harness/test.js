@@ -6,6 +6,10 @@ const path = require("path");
 const { validateDecision } = require("./executor");
 const { decideWithFakeModel } = require("./fake-model");
 const { loadState } = require("./state-loader");
+const {
+  LEGACY_WHITEBOARD_PATH,
+  resolveWhiteboardPath
+} = require("../src/utils/whiteboard-path");
 
 function test(name, fn) {
   try {
@@ -27,6 +31,26 @@ function createTempWhiteboard(content) {
   }
 
   return filePath;
+}
+
+function withEnv(name, value, fn) {
+  const previousValue = process.env[name];
+
+  if (value === undefined) {
+    delete process.env[name];
+  } else {
+    process.env[name] = value;
+  }
+
+  try {
+    fn();
+  } finally {
+    if (previousValue === undefined) {
+      delete process.env[name];
+    } else {
+      process.env[name] = previousValue;
+    }
+  }
 }
 
 test("fake-model read request returns read_whiteboard", () => {
@@ -101,6 +125,21 @@ test("state-loader returns content summary if whiteboard exists", () => {
   assert.strictEqual(state.whiteboard.content, "# Test\n\n## Notes");
   assert.strictEqual(state.whiteboard.lineCount, 3);
   assert.strictEqual(state.whiteboard.charCount, "# Test\n\n## Notes".length);
+});
+
+test("whiteboard path defaults to the legacy tracked artifact", () => {
+  withEnv("CONSYNC_WHITEBOARD_PATH", undefined, () => {
+    assert.strictEqual(resolveWhiteboardPath(), LEGACY_WHITEBOARD_PATH);
+  });
+});
+
+test("whiteboard path uses CONSYNC_WHITEBOARD_PATH when set", () => {
+  withEnv("CONSYNC_WHITEBOARD_PATH", "artifacts/whiteboard.md", () => {
+    assert.strictEqual(
+      resolveWhiteboardPath(),
+      path.resolve(__dirname, "..", "artifacts", "whiteboard.md")
+    );
+  });
 });
 
 if (!process.exitCode) {

@@ -3,11 +3,10 @@ const fs = require("fs");
 const path = require("path");
 
 const { logDebug, logError } = require("./debug");
-
-const ROOT = path.join(__dirname, "artifacts");
+const { resolveWhiteboardPath } = require("../src/utils/whiteboard-path");
 
 function getWhiteboardPath() {
-  return path.join(ROOT, "whiteboard.md");
+  return resolveWhiteboardPath();
 }
 
 function readWhiteboard() {
@@ -15,7 +14,10 @@ function readWhiteboard() {
 }
 
 function appendWhiteboard(content) {
-  fs.appendFileSync(getWhiteboardPath(), "\n" + content + "\n");
+  const whiteboardPath = getWhiteboardPath();
+
+  fs.mkdirSync(path.dirname(whiteboardPath), { recursive: true });
+  fs.appendFileSync(whiteboardPath, "\n" + content + "\n");
   return "Appended";
 }
 

@@ -19,6 +19,8 @@ npm start
 
 This starts the current harness-backed server through the top-level project entry point.
 
+The shared whiteboard artifact is documented in `docs/whiteboard-contract.md`.
+
 ## Available commands
 
 ```bash
@@ -56,3 +58,13 @@ This repository is being cleaned up in small, low-risk steps:
 4. Migrate modules incrementally once path and runtime dependencies are explicit.
 
 See `docs/architecture.md` for the current module breakdown and migration guidance.
+
+## Whiteboard artifact
+
+The project uses a shared Markdown whiteboard as a coordination artifact between tools and agents.
+
+- Default runtime path: `dev-harness/artifacts/whiteboard.md`
+- Optional explicit override: set `CONSYNC_WHITEBOARD_PATH` to point at a different live file
+- Tracked template: `artifacts/whiteboard.example.md`
+
+The contract and handling rules are documented in `docs/whiteboard-contract.md`.
