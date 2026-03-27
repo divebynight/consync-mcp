@@ -1,0 +1,1 @@
+console.log("Consync MCP starting...");
