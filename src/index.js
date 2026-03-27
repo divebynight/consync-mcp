@@ -1,1 +1,1 @@
-console.log("Consync MCP starting...");
+require("../dev-harness/server");
