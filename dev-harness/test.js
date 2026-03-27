@@ -8,7 +8,8 @@ const { decideWithFakeModel } = require("./fake-model");
 const { loadState } = require("./state-loader");
 const {
   LEGACY_WHITEBOARD_PATH,
-  resolveWhiteboardPath
+  resolveWhiteboardPath,
+  validateWhiteboardPath
 } = require("../src/utils/whiteboard-path");
 
 function test(name, fn) {
@@ -140,6 +141,34 @@ test("whiteboard path uses CONSYNC_WHITEBOARD_PATH when set", () => {
       path.resolve(__dirname, "..", "artifacts", "whiteboard.md")
     );
   });
+});
+
+test("validateWhiteboardPath accepts valid file paths", () => {
+  const filePath = createTempWhiteboard("# Test");
+
+  assert.strictEqual(validateWhiteboardPath(filePath), path.normalize(filePath));
+});
+
+test("validateWhiteboardPath accepts non-existent file paths", () => {
+  const filePath = path.join(os.tmpdir(), `consync-whiteboard-${Date.now()}.md`);
+
+  assert.strictEqual(validateWhiteboardPath(filePath), path.normalize(filePath));
+});
+
+test("validateWhiteboardPath rejects directory paths", () => {
+  const dirPath = fs.mkdtempSync(path.join(os.tmpdir(), "consync-whiteboard-dir-"));
+
+  assert.strictEqual(validateWhiteboardPath(dirPath), null);
+});
+
+test("validateWhiteboardPath rejects null and empty paths", () => {
+  assert.strictEqual(validateWhiteboardPath(null), null);
+  assert.strictEqual(validateWhiteboardPath(""), null);
+  assert.strictEqual(validateWhiteboardPath("   "), null);
+});
+
+test("validateWhiteboardPath rejects non-string paths", () => {
+  assert.strictEqual(validateWhiteboardPath(42), null);
 });
 
 if (!process.exitCode) {

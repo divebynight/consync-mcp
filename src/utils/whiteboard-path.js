@@ -1,3 +1,4 @@
+const fs = require("fs");
 const path = require("path");
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..");
@@ -20,9 +21,32 @@ function resolveWhiteboardPath(overridePath) {
     || LEGACY_WHITEBOARD_PATH;
 }
 
+function validateWhiteboardPath(whiteboardPath) {
+  if (typeof whiteboardPath !== "string" || !whiteboardPath.trim()) {
+    return null;
+  }
+
+  const normalizedPath = path.normalize(whiteboardPath);
+
+  try {
+    const stats = fs.statSync(normalizedPath);
+
+    if (stats.isDirectory()) {
+      return null;
+    }
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      return null;
+    }
+  }
+
+  return normalizedPath;
+}
+
 module.exports = {
   EXAMPLE_WHITEBOARD_PATH,
   LEGACY_WHITEBOARD_PATH,
   REPO_ROOT,
-  resolveWhiteboardPath
+  resolveWhiteboardPath,
+  validateWhiteboardPath
 };

@@ -31,3 +31,7 @@ add ## hello from agent
 ## continued from existing state
 
 ## continued from existing state
+
+## hardening live check
+
+curl test line
