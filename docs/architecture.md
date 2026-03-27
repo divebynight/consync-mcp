@@ -11,18 +11,19 @@ The only working runtime implementation currently lives in `dev-harness/`. The t
 1. `src/index.js` acts as the top-level entry point.
 2. `src/index.js` delegates directly to `dev-harness/server.js`.
 3. `dev-harness/server.js` exposes the local HTTP tool endpoint.
-4. `dev-harness/executor.js` sends tool requests to that server.
-5. `dev-harness/agent.js` and `dev-harness/fake-model.js` build decisions.
+4. `src/services/executor.js` sends tool requests to that server.
+5. `src/services/agent.js` and `src/services/fake-model.js` build decisions.
 6. `dev-harness/state-loader.js` reads whiteboard state from `dev-harness/artifacts/whiteboard.md`.
 
 ## Core modules
 
 - `dev-harness/server.js`
-- `dev-harness/executor.js`
-- `dev-harness/agent.js`
-- `dev-harness/fake-model.js`
 - `dev-harness/state-loader.js`
-- `dev-harness/tool-schema.js`
+- `src/services/executor.js`
+- `src/services/agent.js`
+- `src/services/fake-model.js`
+- `src/schemas/tool-schema.js`
+- `src/utils/debug.js`
 
 These files contain the current functional behavior and should be treated as the migration source of truth.
 
@@ -31,6 +32,10 @@ These files contain the current functional behavior and should be treated as the
 - `dev-harness/client.js`
 - `dev-harness/test.js`
 - `dev-harness/debug.js`
+- `dev-harness/agent.js`
+- `dev-harness/executor.js`
+- `dev-harness/fake-model.js`
+- `dev-harness/tool-schema.js`
 - `dev-harness/artifacts/whiteboard.md`
 
 These are useful for local development and validation, but they do not define the long-term project structure by themselves.
@@ -43,10 +48,9 @@ The main blocker to moving code out of `dev-harness/` is path coupling.
 
 ## Recommended migration order
 
-1. Keep `dev-harness/` intact while top-level metadata and entry points are corrected.
-2. Move pure logic modules first, starting with schema and decision logic.
-3. Move orchestration modules after imports are stable.
-4. Move path-coupled storage and server modules last, after introducing an explicit storage location.
+1. Keep `dev-harness/` intact while path-coupled runtime files stay in place.
+2. Extract pure logic and transport modules into `src/`, leaving compatibility wrappers in `dev-harness/`.
+3. Move path-coupled storage and server modules last, after introducing an explicit storage location.
 
 ## Short-term goal
 

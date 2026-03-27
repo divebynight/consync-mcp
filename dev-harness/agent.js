@@ -1,13 +1,5 @@
-const { decideWithFakeModel } = require("./fake-model");
+const { buildDecision } = require("../src/services/agent");
 const { loadState } = require("./state-loader");
-
-function buildDecision(requestText, state) {
-  if (typeof requestText !== "string" || !requestText.trim()) {
-    throw new Error("Usage: node dev-harness/agent.js \"your instruction here\"");
-  }
-
-  return decideWithFakeModel(requestText, state);
-}
 
 function run() {
   const requestText = process.argv.slice(2).join(" ");
