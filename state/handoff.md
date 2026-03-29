@@ -1,27 +1,40 @@
-# Handoff
+# ChatGPT Handoff
 
-## Focus
+Status: PASSED
 
-- Shared-state and handoff workflow setup for `consync-mcp`
+## Goal
+- Add read-only status and handoff display commands while keeping npm run review:handoff as the canonical mutating refresh path.
+- Next: Use npm run status or npm run handoff:print for inspection, and use npm run review:handoff when the tracked state files should be refreshed.
 
-## Changes
+## Runtime truth
+- Canonical implementation: src/
+- Entry point: src/index.js
+- Server: src/server.js
+- Client: src/client.js
+- Test: src/test.js
+- Whiteboard: artifacts/whiteboard.md
 
-- Canonical implementation lives under `src/`
-- Entry point: `src/index.js`
-- Server: `src/server.js`
-- Client: `src/client.js`
-- Tests: `src/test.js`
-- Default live whiteboard path: `artifacts/whiteboard.md`
+## Commands
+- Read-only: npm run status
+- Read-only: npm run handoff:print
+- Mutating: npm run review:handoff
 
-## Pending
+## Verification
+- npm start: passed
+- npm run dev: inferred
+- npm test: passed
+- whiteboard read: passed
+- whiteboard append: passed
+- auth checks: passed
 
-- `npm test` passed at 2026-03-29T18:49:42Z
-- `npm start` worked at 2026-03-29T18:49:42Z
-- whiteboard read/append flows were verified at 2026-03-29T18:49:42Z using a temporary whiteboard path
-- bearer auth behavior was verified at 2026-03-29T18:49:42Z
-- review the new state files and prompt files
-- use the update or verify prompt after the next meaningful repo change
+## Working tree
+- Branch: feature/shared-state-updates
+- Commit: 21a46b57fcbc2a642a9f1f35e0bb2ab983d55547
+- Clean: no
+- Modified: 5
+- Deleted: 0
+- Untracked: 2
 
-## Question
-
-- What should be the next automation target after plain-file shared state: more prompt polish, scripted refresh, or MCP tool support?
+## Blockers
+- Working tree is currently dirty from ongoing refactor and documentation changes.
+- Empty dev-harness directory shells still exist locally even though runtime code no longer depends on them.

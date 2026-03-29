@@ -3,15 +3,15 @@
 ## Repo
 
 - Name: `consync-mcp`
-- Branch: `rescue/wrong-repo-hardening`
-- Commit: `af5acfdeabfb8bdc35f92fa18fe4608486d85268`
+- Branch: `feature/shared-state-updates`
+- Commit: `21a46b57fcbc2a642a9f1f35e0bb2ab983d55547`
 - Working tree: dirty
 
 Tracked changes:
 
-- Modified: `README.md`, `docs/architecture.md`, `docs/whiteboard-contract.md`, `package.json`, `src/index.js`, `src/services/agent.js`, `src/utils/whiteboard-path.js`
-- Deleted: `dev-harness/*` tracked runtime files
-- Untracked: new prompt files, new state files, new docs, `refactor-diff.txt`, and `src/client.js`, `src/server.js`, `src/state-loader.js`, `src/test.js`
+- Modified: `package.json`, `scripts/generate-chatgpt-handoff.js`, `scripts/update-current-state.js`, `state/current-state.json`, `state/current-state.md`
+- Deleted: none
+- Untracked: 2 files
 
 ## Runtime Truth
 
@@ -24,22 +24,22 @@ Tracked changes:
 
 ## Command Status
 
-- `npm start`: verified
+- `npm start`: passed
 - `npm run dev`: inferred
-  - same command as `npm start` in `package.json`
-- `npm test`: verified
-- `src/client.js` read/append/decide/agent/exec flows: verified
-- bearer auth on `/tool`: verified
+- `npm test`: passed
+- whiteboard read: passed
+- whiteboard append: passed
+- bearer auth on `/tool`: passed
 
-Latest verification refresh: `2026-03-29T18:49:42Z`
+Last state update: `2026-03-29T21:08:36.225Z`
 
 ## Current Work
 
-- Goal: set up lightweight shared state and handoff workflow
-- Next step: use the prompt files in `.github/prompts/` to update or verify state after material repo changes
+- Goal: Add read-only status and handoff display commands while keeping npm run review:handoff as the canonical mutating refresh path.
+- Next step: Use npm run status or npm run handoff:print for inspection, and use npm run review:handoff when the tracked state files should be refreshed.
 - Blockers:
-  - working tree is still dirty from ongoing refactor and documentation changes
-  - empty `dev-harness/` directories still exist locally even though runtime behavior has moved to `src/`
+  - Working tree is currently dirty from ongoing refactor and documentation changes.
+  - Empty dev-harness directory shells still exist locally even though runtime code no longer depends on them.
 
 ## State Files
 
