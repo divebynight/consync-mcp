@@ -3,8 +3,8 @@
 Status: PASSED
 
 ## Goal
-- Add a single low-friction review loop entry point that updates state, verifies runtime, and generates the ChatGPT handoff in one command.
-- Next: Use npm run review:handoff as the primary review loop, then decide whether the state files should remain tracked repo files or become generated artifacts.
+- Add read-only status and handoff display commands while keeping npm run review:handoff as the canonical mutating refresh path.
+- Next: Use npm run status or npm run handoff:print for inspection, and use npm run review:handoff when the tracked state files should be refreshed.
 
 ## Runtime truth
 - Canonical implementation: src/
@@ -13,6 +13,11 @@ Status: PASSED
 - Client: src/client.js
 - Test: src/test.js
 - Whiteboard: artifacts/whiteboard.md
+
+## Commands
+- Read-only: npm run status
+- Read-only: npm run handoff:print
+- Mutating: npm run review:handoff
 
 ## Verification
 - npm start: passed
@@ -24,11 +29,11 @@ Status: PASSED
 
 ## Working tree
 - Branch: feature/shared-state-updates
-- Commit: 7cb4bbb83fb85713b6372c30c7a57f69d35d3c86
+- Commit: 21a46b57fcbc2a642a9f1f35e0bb2ab983d55547
 - Clean: no
-- Modified: 2
+- Modified: 5
 - Deleted: 0
-- Untracked: 0
+- Untracked: 2
 
 ## Blockers
 - Working tree is currently dirty from ongoing refactor and documentation changes.

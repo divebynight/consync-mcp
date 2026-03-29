@@ -115,7 +115,10 @@ function buildStateSnapshot(existingState) {
     commands: {
       start: packageJson.scripts && packageJson.scripts.start ? "npm start" : "",
       dev: packageJson.scripts && packageJson.scripts.dev ? "npm run dev" : "",
-      test: packageJson.scripts && packageJson.scripts.test ? "npm test" : ""
+      test: packageJson.scripts && packageJson.scripts.test ? "npm test" : "",
+      status: packageJson.scripts && packageJson.scripts.status ? "npm run status" : "",
+      handoffPrint: packageJson.scripts && packageJson.scripts["handoff:print"] ? "npm run handoff:print" : "",
+      reviewHandoff: packageJson.scripts && packageJson.scripts["review:handoff"] ? "npm run review:handoff" : ""
     },
     features: currentFeatures,
     currentWork,

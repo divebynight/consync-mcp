@@ -87,6 +87,11 @@ function buildHandoff(state) {
     `- Test: ${state.runtime.testFile || "src/test.js"}`,
     `- Whiteboard: ${state.runtime.liveWhiteboardPath || "artifacts/whiteboard.md"}`,
     "",
+    "## Commands",
+    "- Read-only: npm run status",
+    "- Read-only: npm run handoff:print",
+    "- Mutating: npm run review:handoff",
+    "",
     "## Verification",
     ...buildVerificationLines(state.features || {}),
     ...(failingChecks.length > 0
