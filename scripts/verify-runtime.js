@@ -149,6 +149,8 @@ async function verifyServerRuntime() {
   const verifyPort = 3401;
   const whiteboardPath = path.join(os.tmpdir(), `consync-verify-${Date.now()}.md`);
   const child = startProcess(npmCommand(), ["start"], {
+    CONSYNC_AUTH_TOKEN: "",
+    CONSYNC_SERVER_HOST: "127.0.0.1",
     CONSYNC_SERVER_PORT: String(verifyPort),
     CONSYNC_WHITEBOARD_PATH: whiteboardPath
   });

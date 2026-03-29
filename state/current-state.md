@@ -4,14 +4,14 @@
 
 - Name: `consync-mcp`
 - Branch: `feature/shared-state-updates`
-- Commit: `4bdf91a6024c681607178a8de6217a68142b74e3`
+- Commit: `7cb4bbb83fb85713b6372c30c7a57f69d35d3c86`
 - Working tree: dirty
 
 Tracked changes:
 
-- Modified: `package.json`, `state/current-state.json`, `state/current-state.md`
+- Modified: `state/current-state.json`, `state/current-state.md`
 - Deleted: none
-- Untracked: 3 files
+- Untracked: none
 
 ## Runtime Truth
 
@@ -31,12 +31,12 @@ Tracked changes:
 - whiteboard append: passed
 - bearer auth on `/tool`: passed
 
-Last state update: `2026-03-29T19:40:51.425Z`
+Last state update: `2026-03-29T20:51:56.928Z`
 
 ## Current Work
 
-- Goal: Set up shared state and handoff workflow for Consync MCP.
-- Next step: Review the new state and prompt files, then use the update or verify prompts after the next material repo change.
+- Goal: Add a single low-friction review loop entry point that updates state, verifies runtime, and generates the ChatGPT handoff in one command.
+- Next step: Use npm run review:handoff as the primary review loop, then decide whether the state files should remain tracked repo files or become generated artifacts.
 - Blockers:
   - Working tree is currently dirty from ongoing refactor and documentation changes.
   - Empty dev-harness directory shells still exist locally even though runtime code no longer depends on them.

@@ -9,7 +9,8 @@
     "test": "node src/test.js",
     "state:update": "node scripts/update-current-state.js",
     "state:verify": "node scripts/verify-runtime.js",
-    "handoff": "node scripts/generate-chatgpt-handoff.js"
+    "handoff": "node scripts/generate-chatgpt-handoff.js",
+    "review:handoff": "npm run state:update && (npm run state:verify || true) && npm run handoff"
   },
   "keywords": ["mcp", "consync", "ai", "filesystem"],
   "author": "",

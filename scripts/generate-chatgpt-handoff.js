@@ -13,39 +13,6 @@ function readJson(filePath, fallback) {
   }
 }
 
-function readText(filePath) {
-  try {
-    return fs.readFileSync(filePath, "utf8");
-  } catch (error) {
-    return "";
-  }
-}
-
-function findQuestion(handoffText) {
-  const lines = handoffText.split(/\r?\n/);
-  const questionIndex = lines.findIndex(line => line.trim() === "## Question");
-
-  if (questionIndex === -1) {
-    return "- None";
-  }
-
-  const collected = [];
-
-  for (let index = questionIndex + 1; index < lines.length; index += 1) {
-    const line = lines[index];
-
-    if (line.startsWith("## ")) {
-      break;
-    }
-
-    if (line.trim()) {
-      collected.push(line);
-    }
-  }
-
-  return collected.length > 0 ? collected.join("\n") : "- None";
-}
-
 function formatList(items, emptyFallback) {
   if (!items || items.length === 0) {
     return [emptyFallback];
@@ -65,20 +32,73 @@ function buildVerificationLines(features) {
   ];
 }
 
+function getFailingChecks(features) {
+  return Object.entries(features || {})
+    .filter(([, value]) => value && value.status === "failed")
+    .map(([key]) => key);
+}
+
+function formatCheckName(key) {
+  const labels = {
+    serverStart: "npm start",
+    devStart: "npm run dev",
+    testSuite: "npm test",
+    whiteboardRead: "whiteboard read",
+    whiteboardAppend: "whiteboard append",
+    authChecks: "auth checks"
+  };
+
+  return labels[key] || key;
+}
+
 function buildWorkingTreeLines(repo) {
+  const workingTree = repo.workingTree || { modified: [], deleted: [], untracked: [] };
   const lines = [
     `- Branch: ${repo.branch || "unknown"}`,
     `- Commit: ${repo.commit || "unknown"}`,
-    `- Clean: ${repo.workingTree && repo.workingTree.clean ? "yes" : "no"}`
+    `- Clean: ${workingTree.clean ? "yes" : "no"}`
   ];
 
-  if (repo.workingTree) {
-    lines.push(`- Modified: ${repo.workingTree.modified.length}`);
-    lines.push(`- Deleted: ${repo.workingTree.deleted.length}`);
-    lines.push(`- Untracked: ${repo.workingTree.untracked.length}`);
-  }
+  lines.push(`- Modified: ${workingTree.modified.length}`);
+  lines.push(`- Deleted: ${workingTree.deleted.length}`);
+  lines.push(`- Untracked: ${workingTree.untracked.length}`);
 
   return lines;
+}
+
+function buildHandoff(state) {
+  const failingChecks = getFailingChecks(state.features || {});
+  const reviewStatus = failingChecks.length > 0 ? "FAILED" : "PASSED";
+
+  return [
+    "# ChatGPT Handoff",
+    "",
+    `Status: ${reviewStatus}`,
+    "",
+    "## Goal",
+    `- ${state.currentWork.goal || "No current goal recorded."}`,
+    `- Next: ${state.currentWork.nextStep || "No next step recorded."}`,
+    "",
+    "## Runtime truth",
+    "- Canonical implementation: src/",
+    `- Entry point: ${state.runtime.entryPoint || "src/index.js"}`,
+    `- Server: ${state.runtime.serverFile || "src/server.js"}`,
+    `- Client: ${state.runtime.clientFile || "src/client.js"}`,
+    `- Test: ${state.runtime.testFile || "src/test.js"}`,
+    `- Whiteboard: ${state.runtime.liveWhiteboardPath || "artifacts/whiteboard.md"}`,
+    "",
+    "## Verification",
+    ...buildVerificationLines(state.features || {}),
+    ...(failingChecks.length > 0
+      ? ["", "## Failing checks", ...failingChecks.map(check => `- ${formatCheckName(check)}`)]
+      : []),
+    "",
+    "## Working tree",
+    ...buildWorkingTreeLines(state.repo || { workingTree: { modified: [], deleted: [], untracked: [] } }),
+    "",
+    "## Blockers",
+    ...formatList(state.currentWork.blockers || [], "- None")
+  ].join("\n") + "\n";
 }
 
 function main() {
@@ -88,37 +108,10 @@ function main() {
     features: {},
     currentWork: { goal: "", nextStep: "", blockers: [] }
   });
-  const handoffText = readText(STATE_HANDOFF_PATH);
+  const handoffText = buildHandoff(state);
 
-  const lines = [
-    "# ChatGPT Handoff",
-    "",
-    "## Goal",
-    `- ${state.currentWork.goal || "No current goal recorded."}`,
-    `- Next: ${state.currentWork.nextStep || "No next step recorded."}`,
-    "",
-    "## Runtime truth",
-    `- Canonical implementation: src/`,
-    `- Entry point: ${state.runtime.entryPoint || "src/index.js"}`,
-    `- Server: ${state.runtime.serverFile || "src/server.js"}`,
-    `- Client: ${state.runtime.clientFile || "src/client.js"}`,
-    `- Test: ${state.runtime.testFile || "src/test.js"}`,
-    `- Whiteboard: ${state.runtime.liveWhiteboardPath || "artifacts/whiteboard.md"}`,
-    "",
-    "## Verification",
-    ...buildVerificationLines(state.features || {}),
-    "",
-    "## Working tree",
-    ...buildWorkingTreeLines(state.repo),
-    "",
-    "## Blockers",
-    ...formatList(state.currentWork.blockers || [], "- None"),
-    "",
-    "## Question",
-    findQuestion(handoffText)
-  ];
-
-  process.stdout.write(lines.join("\n") + "\n");
+  fs.writeFileSync(STATE_HANDOFF_PATH, handoffText, "utf8");
+  process.stdout.write(handoffText);
 }
 
 main();
