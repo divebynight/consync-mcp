@@ -1,0 +1,106 @@
+{
+  "repo": {
+    "name": "consync-mcp",
+    "branch": "rescue/wrong-repo-hardening",
+    "commit": "af5acfdeabfb8bdc35f92fa18fe4608486d85268",
+    "workingTree": {
+      "clean": false,
+      "modified": [
+        "README.md",
+        "docs/architecture.md",
+        "docs/whiteboard-contract.md",
+        "package.json",
+        "src/index.js",
+        "src/services/agent.js",
+        "src/utils/whiteboard-path.js"
+      ],
+      "deleted": [
+        "dev-harness/agent.js",
+        "dev-harness/artifacts/whiteboard.md",
+        "dev-harness/client.js",
+        "dev-harness/debug.js",
+        "dev-harness/executor.js",
+        "dev-harness/fake-model.js",
+        "dev-harness/server.js",
+        "dev-harness/state-loader.js",
+        "dev-harness/test.js",
+        "dev-harness/tool-schema.js"
+      ],
+      "untracked": [
+        ".github/copilot-instructions.md",
+        ".github/prompts/generate-chatgpt-handoff.prompt.md",
+        ".github/prompts/update-current-state.prompt.md",
+        ".github/prompts/verify-runtime-and-update-state.prompt.md",
+        "docs/ANCHOR_V0_SPEC.md",
+        "docs/README.md",
+        "docs/architecture/README.md",
+        "docs/concepts/README.md",
+        "docs/concepts/consync-v2-overview.md",
+        "docs/current-state-audit.md",
+        "docs/dev/README.md",
+        "docs/post-refactor-verification.md",
+        "docs/refactor-plan.md",
+        "docs/scratch/README.md",
+        "docs/sessions/README.md",
+        "refactor-diff.txt",
+        "src/client.js",
+        "src/server.js",
+        "src/state-loader.js",
+        "src/test.js",
+        "state/current-state.json",
+        "state/current-state.md",
+        "state/handoff.md"
+      ]
+    }
+  },
+  "runtime": {
+    "entryPoint": "src/index.js",
+    "serverFile": "src/server.js",
+    "clientFile": "src/client.js",
+    "testFile": "src/test.js",
+    "liveWhiteboardPath": "artifacts/whiteboard.md"
+  },
+  "commands": {
+    "start": "npm start",
+    "dev": "npm run dev",
+    "test": "npm test"
+  },
+  "features": {
+    "serverStart": {
+      "status": "verified",
+      "notes": "Verified 2026-03-29T18:49:42Z via npm start and direct server boot from src/server.js."
+    },
+    "devStart": {
+      "status": "inferred",
+      "notes": "npm run dev points to the same script as npm start in package.json."
+    },
+    "testSuite": {
+      "status": "verified",
+      "notes": "Verified 2026-03-29T18:49:42Z via npm test using src/test.js."
+    },
+    "whiteboardRead": {
+      "status": "verified",
+      "notes": "Verified 2026-03-29T18:49:42Z through src/client.js read and exec flows using a temporary whiteboard path."
+    },
+    "whiteboardAppend": {
+      "status": "verified",
+      "notes": "Verified 2026-03-29T18:49:42Z through src/client.js append and agent flows using a temporary whiteboard path."
+    },
+    "authChecks": {
+      "status": "verified",
+      "notes": "Verified 2026-03-29T18:49:42Z: /tool returned 401 without token and 200 with a valid bearer token."
+    }
+  },
+  "currentWork": {
+    "goal": "Set up shared state and handoff workflow for Consync MCP.",
+    "nextStep": "Review the new state and prompt files, then use the update or verify prompts after the next material repo change.",
+    "blockers": [
+      "Working tree is currently dirty from ongoing refactor and documentation changes.",
+      "Empty dev-harness directory shells still exist locally even though runtime code no longer depends on them."
+    ]
+  },
+  "meta": {
+    "lastUpdated": "2026-03-29T18:49:42Z",
+    "updatedBy": "copilot"
+  }
+}

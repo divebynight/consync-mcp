@@ -3,14 +3,14 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 
-const { validateDecision } = require("./executor");
-const { decideWithFakeModel } = require("./fake-model");
+const { validateDecision } = require("./services/executor");
+const { decideWithFakeModel } = require("./services/fake-model");
 const { loadState } = require("./state-loader");
 const {
-  LEGACY_WHITEBOARD_PATH,
+  DEFAULT_WHITEBOARD_PATH,
   resolveWhiteboardPath,
   validateWhiteboardPath
-} = require("../src/utils/whiteboard-path");
+} = require("./utils/whiteboard-path");
 
 function test(name, fn) {
   try {
@@ -24,7 +24,7 @@ function test(name, fn) {
 }
 
 function createTempWhiteboard(content) {
-  const dirPath = fs.mkdtempSync(path.join(os.tmpdir(), "dev-harness-"));
+  const dirPath = fs.mkdtempSync(path.join(os.tmpdir(), "consync-whiteboard-"));
   const filePath = path.join(dirPath, "whiteboard.md");
 
   if (content !== null) {
@@ -108,7 +108,7 @@ test("executor validation rejects null tool", () => {
 });
 
 test("state-loader returns safe defaults if whiteboard missing", () => {
-  const dirPath = fs.mkdtempSync(path.join(os.tmpdir(), "dev-harness-missing-"));
+  const dirPath = fs.mkdtempSync(path.join(os.tmpdir(), "consync-missing-"));
   const missingPath = path.join(dirPath, "whiteboard.md");
   const state = loadState(missingPath);
 
@@ -128,9 +128,9 @@ test("state-loader returns content summary if whiteboard exists", () => {
   assert.strictEqual(state.whiteboard.charCount, "# Test\n\n## Notes".length);
 });
 
-test("whiteboard path defaults to the legacy tracked artifact", () => {
+test("whiteboard path defaults to the root artifact path", () => {
   withEnv("CONSYNC_WHITEBOARD_PATH", undefined, () => {
-    assert.strictEqual(resolveWhiteboardPath(), LEGACY_WHITEBOARD_PATH);
+    assert.strictEqual(resolveWhiteboardPath(), DEFAULT_WHITEBOARD_PATH);
   });
 });
 

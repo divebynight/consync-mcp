@@ -1,57 +1,57 @@
 # Architecture
 
-## Current state
+## Runtime layout
 
-The repository is in a transitional state.
+The repository now uses a single implementation tree under `src/`.
 
-The only working runtime implementation currently lives in `dev-harness/`. The top-level `src/` tree exists as the destination structure for a future migration, but it does not yet contain the active server implementation.
+The active runtime entry point is `src/index.js`, which starts the HTTP server in `src/server.js`.
 
 ## Current runtime flow
 
 1. `src/index.js` acts as the top-level entry point.
-2. `src/index.js` delegates directly to `dev-harness/server.js`.
-3. `dev-harness/server.js` exposes the local HTTP tool endpoint.
+2. `src/server.js` exposes the local HTTP tool endpoint.
 4. `src/services/executor.js` sends tool requests to that server.
 5. `src/services/agent.js` and `src/services/fake-model.js` build decisions.
-6. `dev-harness/state-loader.js` reads whiteboard state from `dev-harness/artifacts/whiteboard.md`.
+6. `src/state-loader.js` reads whiteboard state from the resolved runtime path.
 
 ## Core modules
 
-- `dev-harness/server.js`
-- `dev-harness/state-loader.js`
+- `src/server.js`
+- `src/state-loader.js`
+- `src/client.js`
+- `src/test.js`
 - `src/services/executor.js`
 - `src/services/agent.js`
 - `src/services/fake-model.js`
 - `src/schemas/tool-schema.js`
 - `src/utils/debug.js`
 
-These files contain the current functional behavior and should be treated as the migration source of truth.
+These files contain the current functional behavior.
 
-## Harness-specific or support modules
+## Design notes
 
-- `dev-harness/client.js`
-- `dev-harness/test.js`
-- `dev-harness/debug.js`
-- `dev-harness/agent.js`
-- `dev-harness/executor.js`
-- `dev-harness/fake-model.js`
-- `dev-harness/tool-schema.js`
-- `dev-harness/artifacts/whiteboard.md`
+- runtime logic remains intentionally small
+- the server exposes only one endpoint, `POST /tool`
+- current tools remain `read_whiteboard` and `append_whiteboard`
+- the decision logic remains rule-based and deterministic
+- tests remain lightweight and use Node's built-in `assert`
 
-These are useful for local development and validation, but they do not define the long-term project structure by themselves.
+## Storage
 
-## Migration constraints
+- default live whiteboard path: `artifacts/whiteboard.md`
+- tracked template path: `artifacts/whiteboard.example.md`
+- explicit overrides still win via `CONSYNC_WHITEBOARD_PATH`
 
-The main blocker to moving code out of `dev-harness/` is path coupling.
+## Operational commands
 
-`dev-harness/server.js` and `dev-harness/state-loader.js` both rely on `__dirname`-based paths that assume `artifacts/whiteboard.md` exists beside the harness code. Moving those files without first making storage paths explicit would break current behavior.
+- `npm start`
+- `npm run dev`
+- `npm test`
+- `node src/server.js`
+- `node src/client.js <command>`
 
-## Recommended migration order
+## Audit and verification records
 
-1. Keep `dev-harness/` intact while path-coupled runtime files stay in place.
-2. Extract pure logic and transport modules into `src/`, leaving compatibility wrappers in `dev-harness/`.
-3. Move path-coupled storage and server modules last, after introducing an explicit storage location.
-
-## Short-term goal
-
-Maintain a stable, runnable project with a clear top-level entry point while preserving the original harness behavior unchanged.
+- `docs/current-state-audit.md`
+- `docs/refactor-plan.md`
+- `docs/post-refactor-verification.md`

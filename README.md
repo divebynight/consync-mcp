@@ -1,14 +1,15 @@
 # consync-mcp
 
-`consync-mcp` is a Node.js MCP server project that is currently backed by the original development harness.
+`consync-mcp` is a small CommonJS Node.js MCP-style tool server for Consync.
 
-The working implementation still lives in `dev-harness/`. The top-level `src/` directory is the intended long-term home for production code, but it is not fully migrated yet.
+The repository now has a single implementation structure under `src/`.
 
 ## Current status
 
-- The real runnable server is still the harness server in `dev-harness/server.js`.
-- `src/index.js` is a thin top-level shim so the standard npm entry point starts the existing server.
-- No working logic has been moved out of `dev-harness/` yet.
+- `src/index.js` is the package entry point.
+- `src/server.js` contains the HTTP server implementation.
+- `src/client.js` contains the local CLI commands.
+- `src/test.js` contains the current lightweight test suite.
 
 ## Getting started
 
@@ -32,12 +33,12 @@ npm test
 Direct harness commands are also still available while the project is being migrated:
 
 ```bash
-node dev-harness/server.js
-node dev-harness/test.js
-node dev-harness/client.js read
-node dev-harness/client.js append "## New note"
-node dev-harness/client.js decide "show it"
-node dev-harness/client.js agent "add ## hello from agent"
+node src/server.js
+node src/test.js
+node src/client.js read
+node src/client.js append "## New note"
+node src/client.js decide "show it"
+node src/client.js agent "add ## hello from agent"
 ```
 
 ## Configuration
@@ -81,27 +82,28 @@ The server logs a request ID for every request. That request ID is used only in 
 ## Project layout
 
 ```text
-dev-harness/   Current working implementation and test harness
-docs/          Project notes and architecture documentation
-src/           Intended long-term application structure
+src/           Runtime, client, tests, services, schemas, and utilities
+docs/          Project notes, audit notes, and refactor records
+artifacts/     Whiteboard template and optional live whiteboard path
 ```
 
-## Migration approach
+## Runtime flow
 
-This repository is being cleaned up in small, low-risk steps:
+1. `src/index.js` starts the server.
+2. `src/server.js` exposes `POST /tool`.
+3. `src/services/executor.js` sends tool requests to that server.
+4. `src/services/agent.js` and `src/services/fake-model.js` build decisions.
+5. `src/state-loader.js` reads whiteboard state.
 
-1. Keep the current harness runnable.
-2. Fix top-level project metadata and entry points.
-3. Document the existing structure before moving code.
-4. Migrate modules incrementally once path and runtime dependencies are explicit.
+The current current-state audit is captured in `docs/current-state-audit.md`.
 
-See `docs/architecture.md` for the current module breakdown and migration guidance.
+See `docs/architecture.md` for the current module breakdown.
 
 ## Whiteboard artifact
 
 The project uses a shared Markdown whiteboard as a coordination artifact between tools and agents.
 
-- Default runtime path: `dev-harness/artifacts/whiteboard.md`
+- Default runtime path: `artifacts/whiteboard.md`
 - Optional explicit override: set `CONSYNC_WHITEBOARD_PATH` to point at a different live file
 - Tracked template: `artifacts/whiteboard.example.md`
 

@@ -1,7 +1,7 @@
 const fs = require("fs");
 
-const { getRunId, logDebug } = require("./debug");
-const { resolveWhiteboardPath } = require("../src/utils/whiteboard-path");
+const { getRunId, logDebug } = require("./utils/debug");
+const { resolveWhiteboardPath } = require("./utils/whiteboard-path");
 
 function summarize(content, exists) {
   return {
