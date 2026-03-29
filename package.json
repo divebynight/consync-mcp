@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "node src/index.js",
     "start": "node src/index.js",
-    "test": "node src/test.js"
+    "test": "node src/test.js",
+    "state:update": "node scripts/update-current-state.js",
+    "state:verify": "node scripts/verify-runtime.js",
+    "handoff": "node scripts/generate-chatgpt-handoff.js"
   },
   "keywords": ["mcp", "consync", "ai", "filesystem"],
   "author": "",

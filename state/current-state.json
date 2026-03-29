@@ -1,55 +1,20 @@
 {
   "repo": {
     "name": "consync-mcp",
-    "branch": "rescue/wrong-repo-hardening",
-    "commit": "af5acfdeabfb8bdc35f92fa18fe4608486d85268",
+    "branch": "feature/shared-state-updates",
+    "commit": "4bdf91a6024c681607178a8de6217a68142b74e3",
     "workingTree": {
       "clean": false,
       "modified": [
-        "README.md",
-        "docs/architecture.md",
-        "docs/whiteboard-contract.md",
         "package.json",
-        "src/index.js",
-        "src/services/agent.js",
-        "src/utils/whiteboard-path.js"
-      ],
-      "deleted": [
-        "dev-harness/agent.js",
-        "dev-harness/artifacts/whiteboard.md",
-        "dev-harness/client.js",
-        "dev-harness/debug.js",
-        "dev-harness/executor.js",
-        "dev-harness/fake-model.js",
-        "dev-harness/server.js",
-        "dev-harness/state-loader.js",
-        "dev-harness/test.js",
-        "dev-harness/tool-schema.js"
-      ],
-      "untracked": [
-        ".github/copilot-instructions.md",
-        ".github/prompts/generate-chatgpt-handoff.prompt.md",
-        ".github/prompts/update-current-state.prompt.md",
-        ".github/prompts/verify-runtime-and-update-state.prompt.md",
-        "docs/ANCHOR_V0_SPEC.md",
-        "docs/README.md",
-        "docs/architecture/README.md",
-        "docs/concepts/README.md",
-        "docs/concepts/consync-v2-overview.md",
-        "docs/current-state-audit.md",
-        "docs/dev/README.md",
-        "docs/post-refactor-verification.md",
-        "docs/refactor-plan.md",
-        "docs/scratch/README.md",
-        "docs/sessions/README.md",
-        "refactor-diff.txt",
-        "src/client.js",
-        "src/server.js",
-        "src/state-loader.js",
-        "src/test.js",
         "state/current-state.json",
-        "state/current-state.md",
-        "state/handoff.md"
+        "state/current-state.md"
+      ],
+      "deleted": [],
+      "untracked": [
+        "scripts/generate-chatgpt-handoff.js",
+        "scripts/update-current-state.js",
+        "scripts/verify-runtime.js"
       ]
     }
   },
@@ -67,28 +32,28 @@
   },
   "features": {
     "serverStart": {
-      "status": "verified",
-      "notes": "Verified 2026-03-29T18:49:42Z via npm start and direct server boot from src/server.js."
+      "status": "passed",
+      "notes": "Passed 2026-03-29T19:40:51.193Z via npm start on temporary port 3401."
     },
     "devStart": {
       "status": "inferred",
       "notes": "npm run dev points to the same script as npm start in package.json."
     },
     "testSuite": {
-      "status": "verified",
-      "notes": "Verified 2026-03-29T18:49:42Z via npm test using src/test.js."
+      "status": "passed",
+      "notes": "Passed 2026-03-29T19:40:50.752Z via npm test."
     },
     "whiteboardRead": {
-      "status": "verified",
-      "notes": "Verified 2026-03-29T18:49:42Z through src/client.js read and exec flows using a temporary whiteboard path."
+      "status": "passed",
+      "notes": "Passed 2026-03-29T19:40:51.190Z via /tool read on temporary whiteboard path."
     },
     "whiteboardAppend": {
-      "status": "verified",
-      "notes": "Verified 2026-03-29T18:49:42Z through src/client.js append and agent flows using a temporary whiteboard path."
+      "status": "passed",
+      "notes": "Passed 2026-03-29T19:40:51.193Z via append and follow-up read on temporary whiteboard path."
     },
     "authChecks": {
-      "status": "verified",
-      "notes": "Verified 2026-03-29T18:49:42Z: /tool returned 401 without token and 200 with a valid bearer token."
+      "status": "passed",
+      "notes": "Passed 2026-03-29T19:40:51.422Z: /tool returned 401 without token and 200 with a valid bearer token."
     }
   },
   "currentWork": {
@@ -100,7 +65,7 @@
     ]
   },
   "meta": {
-    "lastUpdated": "2026-03-29T18:49:42Z",
+    "lastUpdated": "2026-03-29T19:40:51.425Z",
     "updatedBy": "copilot"
   }
 }
