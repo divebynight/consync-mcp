@@ -2,11 +2,11 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 
-const { logDebug, logError } = require("./debug");
+const { logDebug, logError } = require("./utils/debug");
 const {
   resolveWhiteboardPath,
   validateWhiteboardPath
-} = require("../src/utils/whiteboard-path");
+} = require("./utils/whiteboard-path");
 
 const MAX_BODY_SIZE = 64 * 1024;
 const DEFAULT_SERVER_HOST = "127.0.0.1";
@@ -85,6 +85,10 @@ function readWhiteboard() {
 
   if (!whiteboardPath) {
     throw new Error("Invalid whiteboard path");
+  }
+
+  if (!fs.existsSync(whiteboardPath)) {
+    return "";
   }
 
   return fs.readFileSync(whiteboardPath, "utf-8");
@@ -252,7 +256,6 @@ const server = http.createServer((req, res) => {
           tool: parsed.tool
         });
         return sendJson(res, 400, { error: "Bad Request" });
-
       } catch (err) {
         logError("server", "Request handling failed", {
           runId,
@@ -270,6 +273,8 @@ const server = http.createServer((req, res) => {
 
 server.listen(SERVER_PORT, SERVER_HOST, () => {
   console.log(
-    `Dev Harness Tool Server running on http://${SERVER_HOST}:${SERVER_PORT} (auth ${AUTH_TOKEN ? "enabled" : "disabled"})`
+    `Consync Tool Server running on http://${SERVER_HOST}:${SERVER_PORT} (auth ${AUTH_TOKEN ? "enabled" : "disabled"})`
   );
 });
+
+module.exports = server;

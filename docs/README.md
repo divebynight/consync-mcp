@@ -1,0 +1,1 @@
+Consync documentation structure overview.

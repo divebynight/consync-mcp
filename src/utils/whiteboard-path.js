@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..");
-const LEGACY_WHITEBOARD_PATH = path.join(REPO_ROOT, "dev-harness", "artifacts", "whiteboard.md");
+const DEFAULT_WHITEBOARD_PATH = path.join(REPO_ROOT, "artifacts", "whiteboard.md");
 const EXAMPLE_WHITEBOARD_PATH = path.join(REPO_ROOT, "artifacts", "whiteboard.example.md");
 
 function resolveFromRoot(targetPath) {
@@ -18,7 +18,7 @@ function resolveFromRoot(targetPath) {
 function resolveWhiteboardPath(overridePath) {
   return resolveFromRoot(overridePath)
     || resolveFromRoot(process.env.CONSYNC_WHITEBOARD_PATH)
-    || LEGACY_WHITEBOARD_PATH;
+    || DEFAULT_WHITEBOARD_PATH;
 }
 
 function validateWhiteboardPath(whiteboardPath) {
@@ -44,8 +44,8 @@ function validateWhiteboardPath(whiteboardPath) {
 }
 
 module.exports = {
+  DEFAULT_WHITEBOARD_PATH,
   EXAMPLE_WHITEBOARD_PATH,
-  LEGACY_WHITEBOARD_PATH,
   REPO_ROOT,
   resolveWhiteboardPath,
   validateWhiteboardPath

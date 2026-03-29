@@ -1,0 +1,1 @@
+Session logs (YYYY-MM-DD format).

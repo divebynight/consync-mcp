@@ -1,6 +1,6 @@
-const { buildDecision } = require("./agent");
-const { createRunId, setRunId, logDebug, logError } = require("./debug");
-const { executeDecision } = require("./executor");
+const { buildDecision } = require("./services/agent");
+const { createRunId, setRunId, logDebug, logError } = require("./utils/debug");
+const { executeDecision } = require("./services/executor");
 const { loadState } = require("./state-loader");
 
 function parseDecisionJson(rawJson) {
@@ -24,7 +24,7 @@ async function runDecision(decision, runId) {
   printJson("Result", result);
 }
 
-function loadDecisionState(runId) {
+function loadDecisionState() {
   return loadState();
 }
 
@@ -68,7 +68,7 @@ async function main(runId) {
 
   if (command === "decide") {
     const requestText = process.argv.slice(3).join(" ");
-    const state = loadDecisionState(runId);
+    const state = loadDecisionState();
     logDebug("client", "Building decision", {
       runId,
       userInput: requestText
@@ -80,7 +80,7 @@ async function main(runId) {
 
   if (command === "agent") {
     const requestText = process.argv.slice(3).join(" ");
-    const state = loadDecisionState(runId);
+    const state = loadDecisionState();
     logDebug("client", "Running agent flow", {
       runId,
       userInput: requestText
@@ -95,11 +95,11 @@ async function main(runId) {
   }
 
   console.log("Usage:");
-  console.log("  node dev-harness/client.js read");
-  console.log('  node dev-harness/client.js append "## New note"');
-  console.log("  node dev-harness/client.js exec '{\"tool\":\"read_whiteboard\",\"input\":{}}'");
-  console.log('  node dev-harness/client.js decide "show it"');
-  console.log('  node dev-harness/client.js agent "add ## hello from agent"');
+  console.log("  node src/client.js read");
+  console.log('  node src/client.js append "## New note"');
+  console.log("  node src/client.js exec '{\"tool\":\"read_whiteboard\",\"input\":{}}'");
+  console.log('  node src/client.js decide "show it"');
+  console.log('  node src/client.js agent "add ## hello from agent"');
 }
 
 const runId = createRunId();

@@ -1,1 +1,1 @@
-require("../dev-harness/server");
+require("./server");
