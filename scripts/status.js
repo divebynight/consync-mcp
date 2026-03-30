@@ -60,6 +60,24 @@ function getWorkingTree() {
   };
 }
 
+function normalizeWorkingTree(value) {
+  if (!value) {
+    return {
+      clean: true,
+      modified: [],
+      deleted: [],
+      untracked: []
+    };
+  }
+
+  return {
+    clean: Boolean(value.clean),
+    modified: Array.isArray(value.modified) ? value.modified : [],
+    deleted: Array.isArray(value.deleted) ? value.deleted : [],
+    untracked: Array.isArray(value.untracked) ? value.untracked : []
+  };
+}
+
 function findVerificationSummary(state) {
   const features = state.features || {};
   const checks = [
@@ -87,17 +105,26 @@ function findHandoffStatus(handoffText) {
 function main() {
   const state = readJson(STATE_JSON_PATH, {});
   const workingTree = getWorkingTree();
+  const preRefreshWorkingTree = normalizeWorkingTree(state.repo && state.repo.preRefreshWorkingTree);
   const branch = runCommand("git branch --show-current") || (state.repo && state.repo.branch) || "unknown";
   const handoffStatus = findHandoffStatus(readText(STATE_HANDOFF_PATH));
+  const generatedOutputsUpdated = state.repo && Array.isArray(state.repo.generatedOutputsUpdated)
+    ? state.repo.generatedOutputsUpdated
+    : [];
 
   const lines = [
     "# Repo Status",
     "",
     `- Branch: ${branch}`,
-    `- Working tree: ${workingTree.clean ? "clean" : "dirty"}`,
-    `- Modified: ${workingTree.modified.length}`,
-    `- Deleted: ${workingTree.deleted.length}`,
-    `- Untracked: ${workingTree.untracked.length}`,
+    `- Live working tree: ${workingTree.clean ? "clean" : "dirty"}`,
+    `- Live modified: ${workingTree.modified.length}`,
+    `- Live deleted: ${workingTree.deleted.length}`,
+    `- Live untracked: ${workingTree.untracked.length}`,
+    `- Latest pre-refresh working tree: ${preRefreshWorkingTree.clean ? "clean" : "dirty"}`,
+    `- Latest pre-refresh modified: ${preRefreshWorkingTree.modified.length}`,
+    `- Latest pre-refresh deleted: ${preRefreshWorkingTree.deleted.length}`,
+    `- Latest pre-refresh untracked: ${preRefreshWorkingTree.untracked.length}`,
+    `- Generated outputs updated by refresh: ${generatedOutputsUpdated.length ? generatedOutputsUpdated.join(", ") : "none"}`,
     `- Latest verification: ${findVerificationSummary(state)}`,
     `- Latest handoff: ${handoffStatus}`
   ];

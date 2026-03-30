@@ -7,6 +7,11 @@ const STATE_DIR = path.join(REPO_ROOT, "state");
 const STATE_JSON_PATH = path.join(STATE_DIR, "current-state.json");
 const STATE_MD_PATH = path.join(STATE_DIR, "current-state.md");
 const PACKAGE_JSON_PATH = path.join(REPO_ROOT, "package.json");
+const GENERATED_OUTPUTS_UPDATED = [
+  "state/current-state.json",
+  "state/current-state.md",
+  "state/handoff.md"
+];
 
 function runCommand(command) {
   try {
@@ -87,6 +92,24 @@ function defaultFeatureState() {
   };
 }
 
+function normalizeWorkingTree(value) {
+  if (!value) {
+    return {
+      clean: true,
+      modified: [],
+      deleted: [],
+      untracked: []
+    };
+  }
+
+  return {
+    clean: Boolean(value.clean),
+    modified: Array.isArray(value.modified) ? value.modified : [],
+    deleted: Array.isArray(value.deleted) ? value.deleted : [],
+    untracked: Array.isArray(value.untracked) ? value.untracked : []
+  };
+}
+
 function buildStateSnapshot(existingState) {
   const packageJson = readJson(PACKAGE_JSON_PATH, {});
   const branch = runCommand("git branch --show-current");
@@ -97,13 +120,19 @@ function buildStateSnapshot(existingState) {
   const currentWork = existingState && existingState.currentWork
     ? existingState.currentWork
     : { goal: "", nextStep: "", blockers: [] };
+  const existingRepo = existingState && existingState.repo ? existingState.repo : {};
+  const preRefreshWorkingTree = normalizeWorkingTree(
+    existingRepo.preRefreshWorkingTree || workingTree
+  );
 
   return {
     repo: {
       name: packageJson.name || path.basename(REPO_ROOT),
       branch,
       commit,
-      workingTree
+      workingTree,
+      preRefreshWorkingTree,
+      generatedOutputsUpdated: GENERATED_OUTPUTS_UPDATED
     },
     runtime: {
       entryPoint: "src/index.js",
@@ -143,6 +172,10 @@ function buildMarkdown(state) {
   const modified = state.repo.workingTree.modified;
   const deleted = state.repo.workingTree.deleted;
   const untracked = state.repo.workingTree.untracked;
+  const preRefresh = normalizeWorkingTree(state.repo.preRefreshWorkingTree);
+  const generatedOutputsUpdated = Array.isArray(state.repo.generatedOutputsUpdated)
+    ? state.repo.generatedOutputsUpdated
+    : [];
   const blockers = Array.isArray(state.currentWork.blockers) ? state.currentWork.blockers : [];
 
   const lines = [
@@ -153,13 +186,24 @@ function buildMarkdown(state) {
     `- Name: \`${state.repo.name}\``,
     `- Branch: \`${state.repo.branch || "unknown"}\``,
     `- Commit: \`${state.repo.commit || "unknown"}\``,
-    `- Working tree: ${state.repo.workingTree.clean ? "clean" : "dirty"}`,
+    `- Live working tree: ${state.repo.workingTree.clean ? "clean" : "dirty"}`,
     "",
-    "Tracked changes:",
+    "Live tracked changes:",
     "",
     `- Modified: ${modified.length ? modified.map(filePath => `\`${filePath}\``).join(", ") : "none"}`,
     `- Deleted: ${deleted.length ? deleted.map(filePath => `\`${filePath}\``).join(", ") : "none"}`,
     `- Untracked: ${untracked.length ? `${untracked.length} files` : "none"}`,
+    "",
+    "Pre-refresh snapshot:",
+    "",
+    `- Working tree: ${preRefresh.clean ? "clean" : "dirty"}`,
+    `- Modified: ${preRefresh.modified.length ? preRefresh.modified.map(filePath => `\`${filePath}\``).join(", ") : "none"}`,
+    `- Deleted: ${preRefresh.deleted.length ? preRefresh.deleted.map(filePath => `\`${filePath}\``).join(", ") : "none"}`,
+    `- Untracked: ${preRefresh.untracked.length ? `${preRefresh.untracked.length} files` : "none"}`,
+    "",
+    "Generated outputs updated by refresh:",
+    "",
+    `- ${generatedOutputsUpdated.length ? generatedOutputsUpdated.map(filePath => `\`${filePath}\``).join(", ") : "none"}`,
     "",
     "## Runtime Truth",
     "",
@@ -235,10 +279,13 @@ if (require.main === module) {
 }
 
 module.exports = {
+  GENERATED_OUTPUTS_UPDATED,
   STATE_JSON_PATH,
   STATE_MD_PATH,
   buildMarkdown,
   buildStateSnapshot,
+  getWorkingTree,
+  normalizeWorkingTree,
   readJson,
   writeStateFiles
 };

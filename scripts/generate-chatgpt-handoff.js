@@ -66,9 +66,27 @@ function buildWorkingTreeLines(repo) {
   return lines;
 }
 
+function buildGeneratedOutputsLines(repo) {
+  const generatedOutputsUpdated = Array.isArray(repo.generatedOutputsUpdated)
+    ? repo.generatedOutputsUpdated
+    : [];
+
+  if (generatedOutputsUpdated.length === 0) {
+    return ["- None"];
+  }
+
+  return generatedOutputsUpdated.map(filePath => `- ${filePath}`);
+}
+
 function buildHandoff(state) {
   const failingChecks = getFailingChecks(state.features || {});
   const reviewStatus = failingChecks.length > 0 ? "FAILED" : "PASSED";
+  const repo = state.repo || { workingTree: { modified: [], deleted: [], untracked: [] } };
+  const preRefreshRepo = {
+    branch: repo.branch,
+    commit: repo.commit,
+    workingTree: repo.preRefreshWorkingTree || repo.workingTree || { modified: [], deleted: [], untracked: [] }
+  };
 
   return [
     "# ChatGPT Handoff",
@@ -98,8 +116,11 @@ function buildHandoff(state) {
       ? ["", "## Failing checks", ...failingChecks.map(check => `- ${formatCheckName(check)}`)]
       : []),
     "",
-    "## Working tree",
-    ...buildWorkingTreeLines(state.repo || { workingTree: { modified: [], deleted: [], untracked: [] } }),
+    "## Pre-refresh working tree",
+    ...buildWorkingTreeLines(preRefreshRepo),
+    "",
+    "## Generated outputs updated",
+    ...buildGeneratedOutputsLines(repo),
     "",
     "## Blockers",
     ...formatList(state.currentWork.blockers || [], "- None")
