@@ -3,8 +3,8 @@
 Status: PASSED
 
 ## Goal
-- Add read-only status and handoff display commands while keeping npm run review:handoff as the canonical mutating refresh path.
-- Next: Use npm run status or npm run handoff:print for inspection, and use npm run review:handoff when the tracked state files should be refreshed.
+- Refine refresh reporting so the handoff and status views separate pre-refresh repo dirtiness from generated state-file updates.
+- Next: Use npm run review:handoff to refresh state, then read pre-refresh state separately from generated output updates in the status and handoff views.
 
 ## Runtime truth
 - Canonical implementation: src/
@@ -27,13 +27,18 @@ Status: PASSED
 - whiteboard append: passed
 - auth checks: passed
 
-## Working tree
-- Branch: feature/shared-state-updates
-- Commit: 21a46b57fcbc2a642a9f1f35e0bb2ab983d55547
+## Pre-refresh working tree
+- Branch: feature/clean-up-state-docs
+- Commit: 233b2764a0f9d8c148d82d7b678ddb7d4ee82c5b
 - Clean: no
-- Modified: 5
+- Modified: 6
 - Deleted: 0
-- Untracked: 2
+- Untracked: 0
+
+## Generated outputs updated
+- state/current-state.json
+- state/current-state.md
+- state/handoff.md
 
 ## Blockers
 - Working tree is currently dirty from ongoing refactor and documentation changes.

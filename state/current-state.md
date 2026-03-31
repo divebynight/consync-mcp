@@ -3,15 +3,26 @@
 ## Repo
 
 - Name: `consync-mcp`
-- Branch: `feature/shared-state-updates`
-- Commit: `21a46b57fcbc2a642a9f1f35e0bb2ab983d55547`
-- Working tree: dirty
+- Branch: `feature/clean-up-state-docs`
+- Commit: `233b2764a0f9d8c148d82d7b678ddb7d4ee82c5b`
+- Live working tree: dirty
 
-Tracked changes:
+Live tracked changes:
 
-- Modified: `package.json`, `scripts/generate-chatgpt-handoff.js`, `scripts/update-current-state.js`, `state/current-state.json`, `state/current-state.md`
+- Modified: `scripts/generate-chatgpt-handoff.js`, `scripts/status.js`, `scripts/update-current-state.js`, `state/current-state.json`, `state/current-state.md`, `state/handoff.md`
 - Deleted: none
-- Untracked: 2 files
+- Untracked: none
+
+Pre-refresh snapshot:
+
+- Working tree: dirty
+- Modified: `scripts/generate-chatgpt-handoff.js`, `scripts/status.js`, `scripts/update-current-state.js`, `state/current-state.json`, `state/current-state.md`, `state/handoff.md`
+- Deleted: none
+- Untracked: none
+
+Generated outputs updated by refresh:
+
+- `state/current-state.json`, `state/current-state.md`, `state/handoff.md`
 
 ## Runtime Truth
 
@@ -31,12 +42,12 @@ Tracked changes:
 - whiteboard append: passed
 - bearer auth on `/tool`: passed
 
-Last state update: `2026-03-29T21:08:36.225Z`
+Last state update: `2026-03-30T02:50:34.397Z`
 
 ## Current Work
 
-- Goal: Add read-only status and handoff display commands while keeping npm run review:handoff as the canonical mutating refresh path.
-- Next step: Use npm run status or npm run handoff:print for inspection, and use npm run review:handoff when the tracked state files should be refreshed.
+- Goal: Refine refresh reporting so the handoff and status views separate pre-refresh repo dirtiness from generated state-file updates.
+- Next step: Use npm run review:handoff to refresh state, then read pre-refresh state separately from generated output updates in the status and handoff views.
 - Blockers:
   - Working tree is currently dirty from ongoing refactor and documentation changes.
   - Empty dev-harness directory shells still exist locally even though runtime code no longer depends on them.
